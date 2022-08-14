@@ -51,6 +51,16 @@ func main() {
 		})
 	})
 
+	api.GET("/test", func(c *gin.Context) {
+
+		res, err := RPC("ADD", 66, 10)
+		if err != nil {
+			c.String(http.StatusOK, "Error is :%s",err.Error())
+		} else {
+			c.String(http.StatusOK, "Answer is :%d",res)
+		}
+	})
+
 	api.GET("/add/:a/:b", func(c *gin.Context) {
 		a := c.Param("a")
 		b := c.Param("b")
@@ -58,19 +68,21 @@ func main() {
 		aInt, _ := strconv.ParseInt(a, 10, 32)
 		bInt, _ := strconv.ParseInt(b, 10, 32)
 
-		res := RPC("ADD", aInt, bInt)
-
-		c.String(http.StatusOK, "Answer is :%d",res)
+		res, err := RPC("ADD", aInt, bInt)
+		if err != nil {
+			c.String(http.StatusOK, "Error is :%s",err.Error())
+		} else {
+			c.String(http.StatusOK, "Answer is :%d",res)
+		}
 	})
 
 	r.Run(port)
-
 }
 
-func RPC(op string, a, b int64) int32 {
+func RPC(op string, a, b int64) (int32, error) {
 	conn, err := net.Dial("tcp", "10.98.33.113:9009")
 	if err != nil {
-		log.Fatal(err)
+		return 0, err
 	}
 	defer conn.Close()
 
@@ -82,23 +94,23 @@ func RPC(op string, a, b int64) int32 {
 
 	_, err = conn.Write(header)
 	if err != nil {
-		log.Fatal(err)
+		return 0, err
 	}
 	_, err = conn.Write(body)
 	if err != nil {
-		log.Fatal(err)
+		return 0, err
 	}
 
 	buffer := make([]byte, 4)
 	_, err = conn.Read(buffer)
 	if err != nil {
-		log.Fatal(err)
+		return 0, err
 	}
 
 	res := binary.BigEndian.Uint32(buffer)
 	log.Printf("ans :%d\n",res)
 
-	return int32(res)
+	return int32(res), nil
 }
 
 func main2() {
