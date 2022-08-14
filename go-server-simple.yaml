@@ -1,0 +1,38 @@
+apiVersion: apps/v1  # API版本
+kind: Deployment  # API对象类型
+metadata:
+  name: go-server-simple
+  labels:
+    app: go-server-simple
+spec:
+  selector:
+    matchLabels:
+      app: go-server-simple
+  replicas: 3  # Pod 副本数量
+  template:  # Pod 模板
+    metadata:
+      labels:
+        app: go-server-simple
+    spec:
+      containers:
+        - name: go-server-simple
+          image: qxybest/go-server-simple:latest
+          imagePullPolicy: IfNotPresent # Always
+          ports:
+            - containerPort: 8888
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: go-server-simple-service
+  labels:
+    app: go-server-simple
+spec:
+  selector:
+    app: go-server-simple
+  type: LoadBalancer
+  ports:
+    - protocol: TCP
+      port: 8889
+      targetPort: 8888
+      nodePort: 30001
