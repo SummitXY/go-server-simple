@@ -7,6 +7,7 @@ import (
 	"net"
 	"net/http"
 	"os"
+	"strconv"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -34,13 +35,45 @@ func initClient() (err error) {
 const port = ":8888"
 
 func main() {
-	conn, err := net.Dial("tcp", "localhost:9001")
+
+	fmt.Println("Start listening...")
+	r := gin.Default()
+
+	r.GET("/hello", func(c *gin.Context) {
+		c.String(200, "Hello, World!")
+	})
+
+	api := r.Group("/api")
+
+	api.GET("/ping", func(c *gin.Context) {
+		c.JSON(200, gin.H{
+			"message": "pong",
+		})
+	})
+
+	api.GET("/add/:a/:b", func(c *gin.Context) {
+		a := c.Param("a")
+		b := c.Param("b")
+
+		aInt, _ := strconv.ParseInt(a, 10, 32)
+		bInt, _ := strconv.ParseInt(b, 10, 32)
+
+		res := RPC("ADD", aInt, bInt)
+
+		c.String(http.StatusOK, "Answer is :%d",res)
+	})
+
+}
+
+func RPC(op string, a, b int64) int32 {
+	conn, err := net.Dial("tcp", "192.168.64.2:30002")
 	if err != nil {
 		log.Fatal(err)
 	}
 	defer conn.Close()
 
-	msg := "ADD 50 2"
+	//msg := "ADD 33 2"
+	msg := fmt.Sprintf("%s %d %d",op, a, b)
 	header := make([]byte, 4)
 	body := []byte(msg)
 	binary.BigEndian.PutUint32(header, uint32(len(body)))
@@ -62,6 +95,8 @@ func main() {
 
 	res := binary.BigEndian.Uint32(buffer)
 	log.Printf("ans :%d\n",res)
+
+	return int32(res)
 }
 
 func main2() {
