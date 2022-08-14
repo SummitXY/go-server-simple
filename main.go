@@ -66,7 +66,7 @@ func main() {
 }
 
 func RPC(op string, a, b int64) int32 {
-	conn, err := net.Dial("tcp", "192.168.64.2:30002")
+	conn, err := net.Dial("tcp", "10.98.33.113:9009")
 	if err != nil {
 		log.Fatal(err)
 	}
