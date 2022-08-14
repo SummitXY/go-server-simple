@@ -63,6 +63,8 @@ func main() {
 		c.String(http.StatusOK, "Answer is :%d",res)
 	})
 
+	r.Run(port)
+
 }
 
 func RPC(op string, a, b int64) int32 {

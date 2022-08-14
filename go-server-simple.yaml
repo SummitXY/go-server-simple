@@ -17,7 +17,7 @@ spec:
       containers:
         - name: go-server-simple
           image: qxybest/go-server-simple:latest
-          imagePullPolicy: IfNotPresent # Always
+          imagePullPolicy:  Always # IfNotPresent
           ports:
             - containerPort: 8888
 ---
