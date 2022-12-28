@@ -80,7 +80,7 @@ func main() {
 }
 
 func RPC(op string, a, b int64) (int32, error) {
-	conn, err := net.Dial("tcp", "10.98.33.113:9009")
+	conn, err := net.Dial("tcp", "10.99.20.45:9009")
 	if err != nil {
 		return 0, err
 	}
