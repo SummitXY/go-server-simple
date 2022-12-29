@@ -5,6 +5,8 @@ metadata:
   labels:
     app: go-server-simple
 spec:
+  strategy:
+    type: Recreate
   selector:
     matchLabels:
       app: go-server-simple
